@@ -1,0 +1,33 @@
+[config]
+schemaVersion = "0.0.1"
+
+[package]
+namespace = "AllOfThem"
+name = "CommandItemQueue"
+versionNumber = "1.0.0"
+description = "Queue items for the Artifact of Command per item tier. Command cubes pick the next queued item automatically. Per-tier repeat, named builds, works with new item tiers."
+websiteUrl = "https://github.com/The-regular-Hedgehogs/CommandItemQueue"
+containsNsfwContent = false
+
+[package.dependencies]
+bbepis-BepInExPack = "5.4.2100"
+
+[build]
+icon = "./Thunderstore/icon.png"
+readme = "./Thunderstore/README.md"
+outdir = "./dist"
+
+[[build.copy]]
+source = "./Thunderstore/plugins"
+target = "plugins"
+
+[[build.copy]]
+source = "./Thunderstore/CHANGELOG.md"
+target = "CHANGELOG.md"
+
+[publish]
+repository = "https://thunderstore.io"
+communities = [ "riskofrain2" ]
+
+[publish.categories]
+riskofrain2 = [ "mods", "client-side", "artifacts", "tweaks", "ai-generated" ]

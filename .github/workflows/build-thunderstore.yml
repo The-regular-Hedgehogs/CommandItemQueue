@@ -1,16 +1,26 @@
-name: Build Thunderstore ZIP
+name: Build and publish
 
+# Push to main      -> builds the mod and offers the Thunderstore zip as an artifact.
+# Push a tag "v1.2.3" -> also publishes that version to Thunderstore (team AllOfThem).
+# Manual run         -> choose whether to publish.
 on:
   push:
     branches:
       - main
+    tags:
+      - "v*"
   workflow_dispatch:
+    inputs:
+      publish:
+        description: "Publish to Thunderstore"
+        type: boolean
+        default: false
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Repository
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Setup .NET
@@ -18,11 +28,41 @@ jobs:
         with:
           dotnet-version: 8.0.x
 
+      - name: Read version
+        run: |
+          VERSION=$(jq -r .version_number Thunderstore/manifest.json)
+          TOML_VERSION=$(grep -m1 '^versionNumber' thunderstore.toml | cut -d'"' -f2)
+          if [ "$VERSION" != "$TOML_VERSION" ]; then
+            echo "::error::Version mismatch: manifest.json=$VERSION, thunderstore.toml=$TOML_VERSION"
+            exit 1
+          fi
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+
+      - name: Check tag matches version
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          if [ "${GITHUB_REF_NAME#v}" != "$VERSION" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match version $VERSION in manifest.json"
+            exit 1
+          fi
+
       - name: Build (Release)
         run: dotnet build CommandItemQueue/CommandItemQueue.csproj -c Release
 
       - name: Upload Thunderstore package
         uses: actions/upload-artifact@v4
         with:
-          name: CommandItemQueue-Thunderstore
+          name: AllOfThem-CommandItemQueue-${{ env.VERSION }}
           path: dist/*.zip
+
+      - name: Publish to Thunderstore
+        if: startsWith(github.ref, 'refs/tags/v') || inputs.publish == true
+        env:
+          TCLI_AUTH_TOKEN: ${{ secrets.TCLI_AUTH_TOKEN }}
+        run: |
+          if [ -z "$TCLI_AUTH_TOKEN" ]; then
+            echo "::error::Repository secret TCLI_AUTH_TOKEN is missing"
+            exit 1
+          fi
+          dotnet tool install --global tcli
+          tcli publish --file "dist/AllOfThem-CommandItemQueue-$VERSION.zip"
