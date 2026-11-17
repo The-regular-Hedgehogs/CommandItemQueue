@@ -1,0 +1,53 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>netstandard2.1</TargetFramework>
+		<LangVersion>preview</LangVersion>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<AssemblyName>CommandItemQueue</AssemblyName>
+		<RootNamespace>CommandItemQueue</RootNamespace>
+		<Version>1.0.0</Version>
+		<DebugType>embedded</DebugType>
+		<Nullable>disable</Nullable>
+	</PropertyGroup>
+
+	<!--
+		Test install: after every build the DLL is also copied into your mod manager profile (if the folder exists).
+		Change the profile name here to test in another profile.
+	-->
+	<PropertyGroup>
+		<TestProfile Condition="'$(TestProfile)' == ''">Basics</TestProfile>
+		<R2ModmanPlugins>$(APPDATA)\r2modmanPlus-local\RiskOfRain2\profiles\$(TestProfile)\BepInEx\plugins</R2ModmanPlugins>
+		<ThunderstoreAppPlugins>$(APPDATA)\Thunderstore Mod Manager\DataFolder\RiskOfRain2\profiles\$(TestProfile)\BepInEx\plugins</ThunderstoreAppPlugins>
+		<ThunderstoreDir>$(MSBuildProjectDirectory)\..\Thunderstore\</ThunderstoreDir>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="BepInEx.Analyzers" Version="1.0.*">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+
+		<!-- BepInEx.Core already brings HarmonyX (0Harmony), which ships with every BepInExPack. No R2API needed. -->
+		<PackageReference Include="BepInEx.Core" Version="5.4.21" />
+
+		<PackageReference Include="UnityEngine.Modules" Version="2021.3.33" IncludeAssets="compile" />
+		<PackageReference Include="RiskOfRain2.GameLibs" Version="1.3.6-r.0" />
+	</ItemGroup>
+
+	<Target Name="CopyToThunderstoreAndProfile" AfterTargets="Build">
+		<Copy SourceFiles="$(TargetPath)" DestinationFolder="$(ThunderstoreDir)plugins\$(AssemblyName)\" />
+		<Copy Condition="Exists('$(R2ModmanPlugins)')" SourceFiles="$(TargetPath)" DestinationFolder="$(R2ModmanPlugins)\$(AssemblyName)\" />
+		<Copy Condition="Exists('$(ThunderstoreAppPlugins)')" SourceFiles="$(TargetPath)" DestinationFolder="$(ThunderstoreAppPlugins)\$(AssemblyName)\" />
+		<Message Importance="high" Condition="Exists('$(R2ModmanPlugins)')" Text="CommandItemQueue -> installed into r2modman profile '$(TestProfile)'" />
+		<Message Importance="high" Condition="Exists('$(ThunderstoreAppPlugins)')" Text="CommandItemQueue -> installed into Thunderstore Mod Manager profile '$(TestProfile)'" />
+	</Target>
+
+	<!-- Release build: also creates the upload-ready Thunderstore zip in ..\dist\ -->
+	<Target Name="PackThunderstore" AfterTargets="CopyToThunderstoreAndProfile" Condition="'$(Configuration)' == 'Release'">
+		<MakeDir Directories="$(MSBuildProjectDirectory)\..\dist" />
+		<ZipDirectory SourceDirectory="$(ThunderstoreDir)" DestinationFile="$(MSBuildProjectDirectory)\..\dist\AllOfThem-$(AssemblyName)-$(Version).zip" Overwrite="true" />
+		<Message Importance="high" Text="Thunderstore package: dist\AllOfThem-$(AssemblyName)-$(Version).zip" />
+	</Target>
+
+</Project>
