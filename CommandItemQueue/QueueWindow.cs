@@ -78,6 +78,8 @@ namespace CommandItemQueue
         private Rect queueViewRect;      // outer (unscrolled) coordinates of the queue strip
 
         private readonly List<PickupGroup> visibleGroups = new List<PickupGroup>();
+        private bool editCategories;
+        private int hiddenCategoryCount;
         private readonly List<PickupIndex> visibleItems = new List<PickupIndex>();
 
         private static ArtifactDef commandArtifact;
@@ -359,14 +361,22 @@ namespace CommandItemQueue
 
         private void CollectVisibleGroups()
         {
-            bool showUnavailable = CommandItemQueuePlugin.Cfg.ShowUnavailableItems.Value;
+            var cfg = CommandItemQueuePlugin.Cfg;
+            bool showUnavailable = cfg.ShowUnavailableItems.Value;
             visibleGroups.Clear();
+            hiddenCategoryCount = 0;
             foreach (var g in PickupGroups.GetAll())
             {
                 var q = plugin.Queues.TryGet(g.Key);
                 bool hasQueue = q != null && q.Entries.Count > 0;
-                if (g.Available.Count > 0 || hasQueue || (showUnavailable && g.Members.Count > 0))
-                    visibleGroups.Add(g);
+                if (!(g.Available.Count > 0 || hasQueue || (showUnavailable && g.Members.Count > 0))) continue;
+
+                if (!cfg.IsCategoryVisible(g))
+                {
+                    hiddenCategoryCount++;
+                    if (!editCategories) continue; // hidden categories only show up while editing
+                }
+                visibleGroups.Add(g);
             }
 
             bool selectedVisible = false;
@@ -382,7 +392,7 @@ namespace CommandItemQueue
             ShadowLabel(new Rect(area.x + 14f, area.y + 8f, area.width - 28f, 30f), "Categories", headerStyle);
 
             const float rowH = 52f, gap = 8f;
-            var view = new Rect(area.x + 10f, area.y + 46f, area.width - 20f, area.height - 46f - 62f);
+            var view = new Rect(area.x + 10f, area.y + 46f, area.width - 20f, area.height - 46f - 108f);
             bool needsBar = visibleGroups.Count * (rowH + gap) > view.height;
             var content = new Rect(0f, 0f, view.width - (needsBar ? 16f : 0f), visibleGroups.Count * (rowH + gap));
             bool inView = view.Contains(Event.current.mousePosition);
@@ -396,8 +406,12 @@ namespace CommandItemQueue
                 bool selected = g.Key == selectedKey;
                 bool hover = inView && r.Contains(Event.current.mousePosition);
 
+                bool shown = !editCategories || CommandItemQueuePlugin.Cfg.IsCategoryVisible(g);
+
                 if (Event.current.type == EventType.Repaint)
                 {
+                    var oldColor = GUI.color;
+                    if (!shown) GUI.color = new Color(1f, 1f, 1f, 0.4f);
                     Fill(r, selected ? StripSelected : hover ? StripHover : StripColor);
                     if (selected) GoldLines(r);
                     Fill(new Rect(r.x + 8f, r.y + 10f, 4f, r.height - 20f), g.Color);
@@ -405,11 +419,22 @@ namespace CommandItemQueue
 
                     ShadowLabel(new Rect(r.x + 22f, r.y + 6f, r.width - 90f, 24f), g.DisplayName, nameStyle);
                     ShadowLabel(new Rect(r.x + 22f, r.y + 29f, r.width - 90f, 18f),
-                        $"{g.Available.Count} items" + (q != null && q.Repeat ? "  ·  repeat" : ""), smallStyle);
+                        !shown ? "hidden" : $"{g.Available.Count} items" + (q != null && q.Repeat ? "  ·  repeat" : ""), smallStyle);
 
                     int count = q != null ? q.TotalCount : 0;
-                    if (count > 0)
+                    if (count > 0 && !editCategories)
                         ShadowLabel(new Rect(r.xMax - 70f, r.y, 58f, rowH), "x" + count, countStyle);
+                    GUI.color = oldColor;
+                }
+
+                if (editCategories)
+                {
+                    var toggle = new Rect(r.xMax - 74f, r.y + 10f, 64f, rowH - 20f);
+                    if (Button(toggle, shown ? "Hide" : "Show", shown ? ButtonKind.Normal : ButtonKind.Active, inView))
+                    {
+                        CommandItemQueuePlugin.Cfg.CategoryToggle(g).Value = !shown;
+                        continue;
+                    }
                 }
 
                 if (inView && Clicked(r) == 0)
@@ -423,6 +448,15 @@ namespace CommandItemQueue
 
             if (visibleGroups.Count == 0)
                 ShadowLabel(new Rect(area.x + 14f, area.y + 50f, area.width - 28f, 60f), "No categories yet.\nThey appear once the run is loaded.", smallWrapStyle);
+
+            var edit = new Rect(area.x + 10f, area.yMax - 98f, area.width - 20f, 40f);
+            string editText = editCategories ? "Done"
+                : hiddenCategoryCount > 0 ? $"Show / hide categories ({hiddenCategoryCount} hidden)" : "Show / hide categories";
+            if (Button(edit, editText, editCategories ? ButtonKind.Active : ButtonKind.Normal))
+            {
+                editCategories = !editCategories;
+                if (editCategories) SetStatus("Click Hide / Show next to a category. Hidden categories stay hidden in every run (also in Mod Options).");
+            }
 
             var clearAll = new Rect(area.x + 10f, area.yMax - 52f, area.width - 20f, 40f);
             bool confirming = IsConfirming("clearall", this);

@@ -15,7 +15,7 @@ namespace CommandItemQueue
         public const string PluginAuthor = "AllOfThem";
         public const string PluginName = "CommandItemQueue";
         public const string PluginGUID = PluginAuthor + "." + PluginName;
-        public const string PluginVersion = "1.1.0";
+        public const string PluginVersion = "1.2.0";
 
         internal static CommandItemQueuePlugin Instance { get; private set; }
         internal static PluginConfig Cfg { get; private set; }
@@ -46,6 +46,9 @@ namespace CommandItemQueue
             harmony = new Harmony(PluginGUID);
             AutoPicker.Install(harmony);
 
+            // Categories come from the game data, so their show/hide switches are created once everything is loaded.
+            RoR2Application.onLoad += CreateCategorySwitches;
+
             Run.onRunStartGlobal += OnRunStart;
             Run.onRunDestroyGlobal += OnRunDestroy;
         }
@@ -56,6 +59,17 @@ namespace CommandItemQueue
             Run.onRunDestroyGlobal -= OnRunDestroy;
             try { harmony?.UnpatchSelf(); } catch (Exception e) { Log.Warning(e); }
             Scoreboard?.SetHidden(false);
+        }
+
+        private static void CreateCategorySwitches()
+        {
+            try
+            {
+                PickupGroups.Invalidate();
+                foreach (var group in PickupGroups.GetAll())
+                    Cfg.CategoryToggle(group);
+            }
+            catch (Exception e) { Log.Error("Could not create category settings: " + e); }
         }
 
         private void OnRunStart(Run run)

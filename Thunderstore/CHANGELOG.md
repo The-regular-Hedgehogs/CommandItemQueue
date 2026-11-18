@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.0
+
+- Categories can be hidden: click **Show / hide categories** below the category list, or use the `Categories` section of the config / Risk Of Options. Every category (including ones added by future updates) gets its own switch.
+
 ## 1.1.0
 
 - Works with [Risk Of Options](https://thunderstore.io/package/Rune580/Risk_Of_Options/) (optional): all settings can be changed in game under Settings → Mod Options → CommandItemQueue.

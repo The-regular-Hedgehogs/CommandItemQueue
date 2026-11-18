@@ -7,6 +7,7 @@ Queue up items for the **Artifact of Command**. When you open a command cube, th
 ## Features
 
 - **One queue per item tier**: Common, Uncommon, Legendary, Boss, Lunar, Void tiers, equipment and any tier the game adds later (e.g. Hex, Page). Tiers are read from the game data at startup.
+- **Hide categories** you don't use (e.g. Lunar): click **Show / hide categories** below the category list.
 - **Run once or Repeat**, set per tier. Every run starts with all tiers on Run once.
 - **Builds**: save all queues, including each tier's Run once / Repeat setting, under a name and load them in later runs. One build can be set to load automatically at run start.
 - **Built into the Tab scoreboard**, with item icons and the game's item tooltips.
@@ -61,6 +62,7 @@ With [Risk Of Options](https://thunderstore.io/package/Rune580/Risk_Of_Options/)
 | Scale | 1 | Size of the Item Queue window (1 = as large as fits the screen, down to 0.6) |
 | ShowUnavailableItems | false | Also list items that can't drop in the current run |
 | ShowTooltips | true | Show item tooltips |
+| Categories / *name* | true | Show this category in the Item Queue window. One switch per category, created automatically. Queued items of a hidden category are still picked. |
 
 ## Notes
 

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using BepInEx.Configuration;
 using UnityEngine;
 
@@ -23,11 +24,17 @@ namespace CommandItemQueue
         public readonly ConfigEntry<bool> ShowUnavailableItems;
         public readonly ConfigEntry<bool> ShowTooltips;
 
+        private readonly ConfigFile file;
+        // One "show this category" switch per category. Created at runtime because categories come from the game data.
+        private readonly Dictionary<string, ConfigEntry<bool>> categoryVisibility = new Dictionary<string, ConfigEntry<bool>>();
+        private readonly HashSet<string> usedCategoryNames = new HashSet<string>();
+
         public readonly ConfigEntry<bool> LastViewWasQueue;
         public readonly ConfigEntry<string> DiscoveredCategories;
 
         public PluginConfig(ConfigFile cfg)
         {
+            file = cfg;
             KeepQueueBetweenRuns = cfg.Bind("General", "KeepQueueBetweenRuns", false,
                 "Keep the current queue when a new run starts. If false, the queue is cleared (an auto-load build is still applied).");
             OnlyWithArtifactOfCommand = cfg.Bind("General", "OnlyWithArtifactOfCommand", true,
@@ -52,6 +59,33 @@ namespace CommandItemQueue
                 "Remembers the last selected view. No need to edit.");
             DiscoveredCategories = cfg.Bind("Internal", "DiscoveredCategories", "",
                 "Extra command categories that were discovered at runtime (non-item, non-equipment pickups). No need to edit.");
+        }
+    
+        /// <summary>Switch "Categories / &lt;name&gt;" for a category; created on first use.</summary>
+        public ConfigEntry<bool> CategoryToggle(PickupGroup group)
+        {
+            if (categoryVisibility.TryGetValue(group.Key, out var entry)) return entry;
+
+            string name = ConfigSafe(group.DisplayName);
+            if (string.IsNullOrEmpty(name) || usedCategoryNames.Contains(name))
+                name = ConfigSafe(group.DisplayName + " " + group.Key);
+            usedCategoryNames.Add(name);
+
+            entry = file.Bind("Categories", name, true,
+                $"Show the {group.DisplayName} category in the Item Queue window. Hiding only affects the window; queued items of a hidden category are still picked.");
+            categoryVisibility[group.Key] = entry;
+            RiskOfOptionsCompat.AddCategoryToggle(entry);
+            return entry;
+        }
+
+        public bool IsCategoryVisible(PickupGroup group) => CategoryToggle(group).Value;
+
+        private static string ConfigSafe(string s)
+        {
+            if (string.IsNullOrEmpty(s)) return s;
+            foreach (var c in new[] { '=', '\n', '\t', '\\', '"', '\'', '[', ']', ':', ';' })
+                s = s.Replace(c.ToString(), " ");
+            return s.Trim();
         }
     }
 }

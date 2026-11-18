@@ -64,6 +64,14 @@ namespace CommandItemQueue
             }
         }
 
+        /// <summary>Adds a category switch created at runtime (categories are only known after the game loaded its catalogs).</summary>
+        public static void AddCategoryToggle(ConfigEntry<bool> entry)
+        {
+            if (addOption == null) return;
+            try { Add("CheckBoxOption", entry); }
+            catch (Exception e) { Log.Warning("Could not add category switch to Risk Of Options: " + e.Message); }
+        }
+
         private static void Add(string optionType, ConfigEntryBase entry, object config = null)
         {
             var type = assembly.GetType("RiskOfOptions.Options." + optionType, true);
