@@ -57,7 +57,7 @@ With [Risk Of Options](https://thunderstore.io/package/Rune580/Risk_Of_Options/)
 | ManualPickKey | LeftAlt | Hold while opening a cube to choose yourself |
 | DefaultView | RememberLast | View shown when opening the scoreboard |
 | SwitchViewKey | none | Optional key to switch between Scoreboard and Item Queue |
-| Scale | 1 | Size of the Item Queue window |
+| Scale | 1 | Size of the Item Queue window (1 = as large as fits the screen, down to 0.6) |
 | ShowUnavailableItems | false | Also list items that can't drop in the current run |
 | ShowTooltips | true | Show item tooltips |
 

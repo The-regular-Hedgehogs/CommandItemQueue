@@ -42,7 +42,7 @@ namespace CommandItemQueue
             SwitchViewKey = cfg.Bind("UI", "SwitchViewKey", KeyboardShortcut.Empty,
                 "Optional key to switch between Scoreboard and Item Queue while the scoreboard is open (you can always click the tabs).");
             UiScale = cfg.Bind("UI", "Scale", 1f,
-                new ConfigDescription("Scale of the Item Queue window.", new AcceptableValueRange<float>(0.5f, 2f)));
+                new ConfigDescription("Size of the Item Queue window. 1 = as large as fits the screen, smaller values shrink it.", new AcceptableValueRange<float>(0.6f, 1f)));
             ShowUnavailableItems = cfg.Bind("UI", "ShowUnavailableItems", false,
                 "Also show items that cannot drop in the current run (locked, disabled expansion, ...). They are skipped when picking.");
             ShowTooltips = cfg.Bind("UI", "ShowTooltips", true,

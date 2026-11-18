@@ -29,6 +29,11 @@
 		<PackageReference Include="RiskOfRain2.GameLibs" Version="1.3.6-r.0" />
 	</ItemGroup>
 
+	<!-- Icon for the Risk Of Options settings page, embedded so it also shows in local test builds. -->
+	<ItemGroup>
+		<EmbeddedResource Include="..\Thunderstore\icon.png" LogicalName="CommandItemQueue.icon.png" />
+	</ItemGroup>
+
 	<Target Name="CopyToThunderstoreAndProfile" AfterTargets="Build">
 		<Copy SourceFiles="$(TargetPath)" DestinationFolder="$(ThunderstoreDir)plugins\$(AssemblyName)\" />
 	</Target>

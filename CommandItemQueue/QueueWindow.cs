@@ -179,7 +179,11 @@ namespace CommandItemQueue
             EnsureStyles();
             var cfg = CommandItemQueuePlugin.Cfg;
 
-            float scale = Mathf.Max(0.3f, Screen.height / 1080f * cfg.UiScale.Value);
+            // The layout is designed for a fixed virtual canvas. Scale 1 = as large as fits the screen,
+            // smaller values shrink it. It can never grow past the screen, so nothing gets squeezed.
+            const float designW = 1760f, designH = 1000f;
+            float fit = Mathf.Min(Screen.width / designW, Screen.height / designH);
+            float scale = Mathf.Max(0.2f, fit * Mathf.Clamp(cfg.UiScale.Value, 0.6f, 1f));
             GUI.matrix = Matrix4x4.TRS(Vector3.zero, Quaternion.identity, new Vector3(scale, scale, 1f));
             float vw = Screen.width / scale;
             float vh = Screen.height / scale;
@@ -188,15 +192,16 @@ namespace CommandItemQueue
             hoverPickup = PickupIndex.none;
             hoverHint = null;
 
-            DrawTabs(vw);
+            float top = Mathf.Max(0f, (vh - designH) / 2f);
+            DrawTabs(vw, top);
             if (!showQueue) { CancelDrag(); return; }
 
             HandleDragEvents();
 
             // Same footprint as the vanilla scoreboard: centred, leaving the HUD edges free.
-            float w = Mathf.Min(1640f, vw - 120f);
-            float h = Mathf.Min(860f, vh - 150f);
-            var panel = new Rect((vw - w) / 2f, 92f, w, h);
+            float w = Mathf.Min(1640f, vw - 40f);
+            float h = Mathf.Min(860f, vh - top - 110f);
+            var panel = new Rect((vw - w) / 2f, top + 92f, w, h);
 
             const float gap = 18f;
             var categories = new Rect(panel.x, panel.y, 260f, h);
@@ -313,9 +318,10 @@ namespace CommandItemQueue
                 dragSource == DragSource.Queue && !overQueue ? centeredSmallRedLeft : goldSmallLeft);
         }
 
-        private void DrawTabs(float vw)
+        private void DrawTabs(float vw, float top)
         {
-            const float tabW = 250f, tabH = 40f, y = 14f;
+            const float tabW = 250f, tabH = 40f;
+            float y = top + 14f;
             int total = plugin.Queues.TotalQueued;
             var left = new Rect(vw / 2f - tabW - 4f, y, tabW, tabH);
             var right = new Rect(vw / 2f + 4f, y, tabW, tabH);

@@ -38,7 +38,7 @@ namespace CommandItemQueue
                 // UI
                 Add("ChoiceOption", cfg.DefaultView);
                 Add("KeyBindOption", cfg.SwitchViewKey);
-                Add("SliderOption", cfg.UiScale, SliderConfig(0.5f, 2f, "{0:0.00}"));
+                Add("SliderOption", cfg.UiScale, SliderConfig(0.6f, 1f, "{0:0.00}"));
                 Add("CheckBoxOption", cfg.ShowUnavailableItems);
                 Add("CheckBoxOption", cfg.ShowTooltips);
 
@@ -83,11 +83,29 @@ namespace CommandItemQueue
             return config;
         }
 
-        /// <summary>Uses the Thunderstore icon.png that the mod manager puts next to (or above) the DLL.</summary>
+        /// <summary>Icon embedded in the DLL; falls back to the Thunderstore icon.png next to (or above) the DLL.</summary>
         private static Sprite LoadIcon(string pluginLocation)
         {
             try
             {
+                using (var stream = typeof(RiskOfOptionsCompat).Assembly.GetManifestResourceStream("CommandItemQueue.icon.png"))
+                {
+                    if (stream != null)
+                    {
+                        var bytes = new byte[stream.Length];
+                        int read = 0;
+                        while (read < bytes.Length)
+                        {
+                            int n = stream.Read(bytes, read, bytes.Length - read);
+                            if (n <= 0) break;
+                            read += n;
+                        }
+                        var embedded = new Texture2D(2, 2, TextureFormat.RGBA32, false);
+                        if (ImageConversion.LoadImage(embedded, bytes))
+                            return Sprite.Create(embedded, new Rect(0f, 0f, embedded.width, embedded.height), new Vector2(0.5f, 0.5f));
+                    }
+                }
+
                 var dir = Path.GetDirectoryName(pluginLocation);
                 for (int i = 0; i < 3 && !string.IsNullOrEmpty(dir); i++)
                 {
