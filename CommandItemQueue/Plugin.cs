@@ -9,12 +9,13 @@ namespace CommandItemQueue
     // Client-side only: the choice is sent through the vanilla command-cube network message,
     // so this works even if the host or other players don't have the mod installed.
     [BepInPlugin(PluginGUID, PluginName, PluginVersion)]
+    [BepInDependency(RiskOfOptionsCompat.Guid, BepInDependency.DependencyFlags.SoftDependency)]
     public class CommandItemQueuePlugin : BaseUnityPlugin
     {
         public const string PluginAuthor = "AllOfThem";
         public const string PluginName = "CommandItemQueue";
         public const string PluginGUID = PluginAuthor + "." + PluginName;
-        public const string PluginVersion = "1.0.1";
+        public const string PluginVersion = "1.1.0";
 
         internal static CommandItemQueuePlugin Instance { get; private set; }
         internal static PluginConfig Cfg { get; private set; }
@@ -33,6 +34,7 @@ namespace CommandItemQueue
 
             Cfg = new PluginConfig(Config);
             PickupGroups.LoadDiscovered(Cfg.DiscoveredCategories.Value);
+            RiskOfOptionsCompat.TryRegister(Cfg, Info.Location);
 
             Queues = new QueueManager();
             Builds = new BuildStore(System.IO.Path.Combine(Paths.ConfigPath, PluginName + ".builds.txt"));

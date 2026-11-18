@@ -47,7 +47,7 @@ Builds are stored in `BepInEx/config/CommandItemQueue.builds.txt`.
 
 ## Configuration
 
-`BepInEx/config/AllOfThem.CommandItemQueue.cfg`
+With [Risk Of Options](https://thunderstore.io/package/Rune580/Risk_Of_Options/) installed, all settings can be changed in game under **Settings → Mod Options → CommandItemQueue**. Otherwise edit `BepInEx/config/AllOfThem.CommandItemQueue.cfg`.
 
 | Setting | Default | Description |
 |---|---|---|
@@ -63,7 +63,7 @@ Builds are stored in `BepInEx/config/CommandItemQueue.builds.txt`.
 
 ## Notes
 
-- Requires only BepInEx. R2API is not needed.
+- Requires only BepInEx. R2API is not needed. Risk Of Options is optional.
 - Keyboard and mouse only. Controllers are not supported.
 
 ## AI disclosure

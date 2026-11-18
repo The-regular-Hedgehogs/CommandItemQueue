@@ -1,6 +1,6 @@
 {
   "name": "CommandItemQueue",
-  "version_number": "1.0.1",
+  "version_number": "1.1.0",
   "website_url": "https://github.com/The-regular-Hedgehogs/CommandItemQueue",
   "description": "Queue items for the Artifact of Command per item tier. Command cubes pick the next queued item automatically. Per-tier repeat, named builds, works with new item tiers.",
   "dependencies": [
