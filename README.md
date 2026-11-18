@@ -10,6 +10,7 @@ Queue up items for the **Artifact of Command**. When you open a command cube, th
 - **Run once or Repeat**, set per tier. Every run starts with all tiers on Run once.
 - **Builds**: save all queues, including each tier's Run once / Repeat setting, under a name and load them in later runs. One build can be set to load automatically at run start.
 - **Built into the Tab scoreboard**, with item icons and the game's item tooltips.
+- **In-game settings** with [Risk Of Options](https://thunderstore.io/package/Rune580/Risk_Of_Options/) (optional): Settings → Mod Options → CommandItemQueue.
 - **Client-side**: only you need the mod. It also works when the host doesn't have it.
 
 ## How to use
