@@ -2,6 +2,8 @@
 
 Queue up items for the **Artifact of Command**. When you open a command cube, the next queued item of that tier is picked automatically.
 
+![Item Queue window in the Tab scoreboard](https://raw.githubusercontent.com/The-regular-Hedgehogs/CommandItemQueue/main/docs/screenshot.jpg)
+
 ## Features
 
 - **One queue per item tier**: Common, Uncommon, Legendary, Boss, Lunar, Void tiers, equipment and any tier the game adds later (e.g. Hex, Page). Tiers are read from the game data at startup.

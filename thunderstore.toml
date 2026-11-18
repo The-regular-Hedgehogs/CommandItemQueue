@@ -4,7 +4,7 @@ schemaVersion = "0.0.1"
 [package]
 namespace = "AllOfThem"
 name = "CommandItemQueue"
-versionNumber = "1.0.0"
+versionNumber = "1.0.1"
 description = "Queue items for the Artifact of Command per item tier. Command cubes pick the next queued item automatically. Per-tier repeat, named builds, works with new item tiers."
 websiteUrl = "https://github.com/The-regular-Hedgehogs/CommandItemQueue"
 containsNsfwContent = false

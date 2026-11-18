@@ -14,7 +14,7 @@ namespace CommandItemQueue
         public const string PluginAuthor = "AllOfThem";
         public const string PluginName = "CommandItemQueue";
         public const string PluginGUID = PluginAuthor + "." + PluginName;
-        public const string PluginVersion = "1.0.0";
+        public const string PluginVersion = "1.0.1";
 
         internal static CommandItemQueuePlugin Instance { get; private set; }
         internal static PluginConfig Cfg { get; private set; }

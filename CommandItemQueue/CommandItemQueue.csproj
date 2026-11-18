@@ -6,7 +6,7 @@
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<AssemblyName>CommandItemQueue</AssemblyName>
 		<RootNamespace>CommandItemQueue</RootNamespace>
-		<Version>1.0.0</Version>
+		<Version>1.0.1</Version>
 		<DebugType>embedded</DebugType>
 		<Nullable>disable</Nullable>
 	</PropertyGroup>
