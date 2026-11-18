@@ -11,14 +11,8 @@
 		<Nullable>disable</Nullable>
 	</PropertyGroup>
 
-	<!--
-		Test install: after every build the DLL is also copied into your mod manager profile (if the folder exists).
-		Change the profile name here to test in another profile.
-	-->
+	<!-- Test install into the mod manager profile is handled by C:\Users\Pascal\source\repos\Directory.Build.targets (profile "TestMods"). -->
 	<PropertyGroup>
-		<TestProfile Condition="'$(TestProfile)' == ''">Basics</TestProfile>
-		<R2ModmanPlugins>$(APPDATA)\r2modmanPlus-local\RiskOfRain2\profiles\$(TestProfile)\BepInEx\plugins</R2ModmanPlugins>
-		<ThunderstoreAppPlugins>$(APPDATA)\Thunderstore Mod Manager\DataFolder\RiskOfRain2\profiles\$(TestProfile)\BepInEx\plugins</ThunderstoreAppPlugins>
 		<ThunderstoreDir>$(MSBuildProjectDirectory)\..\Thunderstore\</ThunderstoreDir>
 	</PropertyGroup>
 
@@ -37,10 +31,6 @@
 
 	<Target Name="CopyToThunderstoreAndProfile" AfterTargets="Build">
 		<Copy SourceFiles="$(TargetPath)" DestinationFolder="$(ThunderstoreDir)plugins\$(AssemblyName)\" />
-		<Copy Condition="Exists('$(R2ModmanPlugins)')" SourceFiles="$(TargetPath)" DestinationFolder="$(R2ModmanPlugins)\$(AssemblyName)\" />
-		<Copy Condition="Exists('$(ThunderstoreAppPlugins)')" SourceFiles="$(TargetPath)" DestinationFolder="$(ThunderstoreAppPlugins)\$(AssemblyName)\" />
-		<Message Importance="high" Condition="Exists('$(R2ModmanPlugins)')" Text="CommandItemQueue -> installed into r2modman profile '$(TestProfile)'" />
-		<Message Importance="high" Condition="Exists('$(ThunderstoreAppPlugins)')" Text="CommandItemQueue -> installed into Thunderstore Mod Manager profile '$(TestProfile)'" />
 	</Target>
 
 	<!-- Release build: also creates the upload-ready Thunderstore zip in ..\dist\ -->
